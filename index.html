@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+<!--jQuery dependencies-->
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+<!--PQ Grid files-->
+		<link rel="stylesheet" href="js/grid/pqgrid.min.css" />
+		<script src="js/grid/pqgrid.min.js"></script>
+<!--PQ Grid Office theme-->
+		<link rel="stylesheet" href="js/grid/themes/office/pqgrid.css" />
+        <title>REST API Login Demo</title>
+    </head>
+    <body>
+        <script class="ppjs">
+            $(function () {
+                var colM = [
+                    { title: "Code", width: "10%", dataIndx: "code" },
+                    { title: "Name", width: "30%", dataIndx: "name" },
+                    { title: "Population", width: "20%", dataIndx: "population", align: "right" },
+                    { title: "Head of State", width: "40%", dataIndx: "headOfState"}
+                ];
+                var dataModel = {
+                        location: "remote",
+                        paging: "remote",
+                        dataType: "JSON",
+                        method: "POST",
+                        getUrl: function (ui) {
+                            if (ui.pageModel.curPage<1)
+                                ui.pageModel.curPage=1;
+                            var data = {
+                                pq_curpage: ui.pageModel.curPage,
+                                pq_rpp: ui.pageModel.rPP
+                            };
+                            data['toSearch']=$("#search").val();
+                            var obj = { url: "api/getCountries.php", data:data };
+                            return obj;
+                        },
+                        getData: function ( dataJSON, textStatus, jqXHR) {                
+                            return { curPage: dataJSON.currPage, totalRecords: dataJSON.totalRecords, data: dataJSON.data };
+                        }
+                };
+                var grid1 = $("#gridArray").pqGrid({ width: 800, height: 450,
+                    dataModel: dataModel,
+                    colModel: colM,
+                    pageModel: { type: "remote", rPP: 20, strRpp: "{0}" },
+                    sortable: false,
+                    selectionModel: { swipe: false },
+                    wrap: false, hwrap: false,
+                    numberCell: { resizable: true, width: 30, title: "#" },
+                    title: "Countries",
+                    resizable: true
+                });
+            });
+            function startSearch() {
+                $("#gridArray").pqGrid("refreshDataAndView");
+                return false;
+            }
+        </script>
+
+        <div id="searchBox">
+            <form>
+                Global search: <input type="text" id="search">
+                <button type="button" onclick="startSearch()">Search</button>
+            </form>
+        </div>
+        <div id="gridArray">
+        </div>
+        
+    </body>
+</html>
